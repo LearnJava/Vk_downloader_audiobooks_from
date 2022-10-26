@@ -22,7 +22,7 @@ fun main() {
 fun startHere() {
     System.setProperty(
         "webdriver.chrome.driver",
-        "C:\\Users\\User\\IdeaProjects\\Vk_downloader_audiobooks_from\\chromedriver_win32\\chromedriver.exe"
+        "C:\\Users\\konstantin\\IdeaProjects\\Vk_downloader_audiobooks_from\\chromedriver_win32\\chromedriver.exe"
     )
 
 //    Configuration.browser = "chrome"
@@ -45,26 +45,33 @@ fun startHere() {
     var downloadButtons = `$$`(Selectors.byXpath("//div[@class=\"vkd_download_all_btn\"]"))
 
     while (true) {
-        if (downloadButtons.isNotEmpty()) {
-            downloadButtons.first().click()
-
-            while (true) {
-                try {
-                    Selenide.`$`(Selectors.byXpath("//div[@class=\"vkd_download_all_btn vkd_downloading\"]"))
-                        .should(
-                            Condition.exist, Duration.ofSeconds(4)
-                        )
-
-                } catch (e: ElementNotFound) {
-                    break
+        try {
+            if (downloadButtons.isNotEmpty()) {
+//                downloadButtons.last().click()
+                for (button in downloadButtons.chunked(5).first()) {
+                    button.click()
                 }
+
+                while (true) {
+                    try {
+                        Selenide.`$`(Selectors.byXpath("//div[@class=\"vkd_download_all_btn vkd_downloading\"]"))
+                            .should(
+                                Condition.exist, Duration.ofSeconds(4)
+                            )
+                    } catch (e: ElementNotFound) {
+                        break
+                    }
+                }
+
+                downloadButtons = `$$`(Selectors.byXpath("//div[@class=\"vkd_download_all_btn\"]"))
+                println("Качаем новую книгу.")
             }
+        } catch (e: Exception) {
 
-            downloadButtons = `$$`(Selectors.byXpath("//div[@class=\"vkd_download_all_btn\"]"))
-
-        } else {
-            break
         }
+//        else {
+//            break
+//        }
     }
 
 
